@@ -303,15 +303,19 @@ public class OverlayService extends Service implements View.OnTouchListener {
 
     @Override
     public void onCreate() {
+        super.onCreate();
         createNotificationChannel();
 
-        Log.d("debug", "Message id is: " + WindowSetup.messageId);
+        String messageId = WindowSetup.messageId; // Assuming you have the messageId here
+
+        Log.d("debug", "Message id is: " + messageId);
 
         FlutterEngine flutterEngine = new FlutterEngine(this);
 
         DartExecutor.DartEntrypoint entryPoint = new DartExecutor.DartEntrypoint(
-                "assets/flutter_assets",  // Adjusted path that includes the 'assets/' prefix
-                "runOverlay"  // Name of your Dart entry function
+                getAssets(),
+                FlutterMain.findAppBundlePath(),
+                "runOverlay"
         );
 
         // Start executing Dart code to display the overlay
@@ -319,10 +323,9 @@ public class OverlayService extends Service implements View.OnTouchListener {
 
         FlutterEngineCache.getInstance().put("overlay_engine", flutterEngine);
 
-        flutterChannel = new MethodChannel(FlutterEngineCache.getInstance().get("overlay_engine").getDartExecutor(), OverlayConstants.OVERLAY_TAG);
-        overlayMessageChannel = new BasicMessageChannel(FlutterEngineCache.getInstance().get("overlay_engine").getDartExecutor(), OverlayConstants.MESSENGER_TAG, JSONMessageCodec.INSTANCE);
-
-
+        // MethodChannel to send messageId to Dart
+        new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), "com.example.overlay/method_channel")
+                .invokeMethod("setMessageId", messageId);
 
         Intent notificationIntent = new Intent(this, FlutterOverlayWindowPlugin.class);
         int pendingFlags;
@@ -344,6 +347,7 @@ public class OverlayService extends Service implements View.OnTouchListener {
         startForeground(OverlayConstants.NOTIFICATION_ID, notification);
         instance = this;
     }
+
 
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
