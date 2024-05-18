@@ -314,7 +314,7 @@ public class OverlayService extends Service implements View.OnTouchListener {
 
         DartExecutor.DartEntrypoint entryPoint = new DartExecutor.DartEntrypoint(
                 getAssets(),
-                "assets/flutter_assets",
+                FlutterMain.findAppBundlePath(),
                 "runOverlay"
         );
 
