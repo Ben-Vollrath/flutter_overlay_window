@@ -181,7 +181,7 @@ public class OverlayService extends Service implements View.OnTouchListener {
         flutterView.setOnTouchListener(this);
         windowManager.addView(flutterView, params);
         moveOverlay(dx, dy, null);
-        Log.d("debug", "onstart ran through correclty test123");
+        Log.d("debug", "onstart ran through correclty");
         return START_STICKY;
     }
 
@@ -304,8 +304,6 @@ public class OverlayService extends Service implements View.OnTouchListener {
     @Override
     public void onCreate() {
         createNotificationChannel();
-
-        Log.d("debug", "Message id is: " + WindowSetup.messageId);
 
         FlutterEngine flutterEngine = new FlutterEngine(this);
 
