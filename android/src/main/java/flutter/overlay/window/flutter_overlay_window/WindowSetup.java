@@ -13,6 +13,8 @@ public abstract class WindowSetup {
     static int height = WindowManager.LayoutParams.MATCH_PARENT;
     static int width = WindowManager.LayoutParams.MATCH_PARENT;
     static int flag = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+
+    static String messageId = "";
     static int gravity = Gravity.CENTER;
     static BasicMessageChannel<Object> messenger = null;
     static String overlayTitle = "Overlay is activated";
@@ -32,6 +34,10 @@ public abstract class WindowSetup {
         if (name.equalsIgnoreCase("visibilityPrivate")) {
             notificationVisibility = NotificationCompat.VISIBILITY_PRIVATE;
         }
+    }
+
+    static void setMessageId(String messageIdParam){
+        messageId = messageIdParam;
     }
 
     static void setFlag(String name) {
