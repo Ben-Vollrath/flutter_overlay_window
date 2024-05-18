@@ -317,16 +317,14 @@ public class OverlayService extends Service implements View.OnTouchListener {
                 "runOverlay"
         );
 
-        // MethodChannel to send messageId to Dart
-        new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), "com.example.overlay/method_channel")
-                .invokeMethod("setMessageId", messageId);
-
         // Start executing Dart code to display the overlay
         flutterEngine.getDartExecutor().executeDartEntrypoint(entryPoint);
 
         FlutterEngineCache.getInstance().put("overlay_engine", flutterEngine);
 
-
+        // MethodChannel to send messageId to Dart
+        new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), "com.example.overlay/method_channel")
+                .invokeMethod("setMessageId", messageId);
 
         Intent notificationIntent = new Intent(this, FlutterOverlayWindowPlugin.class);
         int pendingFlags;
