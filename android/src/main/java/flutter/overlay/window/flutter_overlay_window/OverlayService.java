@@ -46,6 +46,15 @@ import io.flutter.embedding.engine.dart.DartExecutor;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.BasicMessageChannel;
 import io.flutter.plugin.common.JSONMessageCodec;
+import io.flutter.embedding.engine.FlutterEngine;
+import io.flutter.embedding.engine.FlutterEngineCache;
+import io.flutter.embedding.engine.dart.DartExecutor;
+import io.flutter.embedding.engine.loader.FlutterLoader;
+import io.flutter.plugin.common.MethodChannel;
+import io.flutter.plugin.common.BasicMessageChannel;
+import io.flutter.plugin.common.JSONMessageCodec;
+import io.flutter.view.FlutterMain;
+import io.flutter.view.FlutterRunArguments;
 
 public class OverlayService extends Service implements View.OnTouchListener {
     private final int DEFAULT_NAV_BAR_HEIGHT_DP = 48;
@@ -308,7 +317,7 @@ public class OverlayService extends Service implements View.OnTouchListener {
         FlutterEngine flutterEngine = new FlutterEngine(this);
 
         DartExecutor.DartEntrypoint entryPoint = new DartExecutor.DartEntrypoint(
-                "assets/flutter_assets",  // Adjusted path that includes the 'assets/' prefix
+                FlutterMain.findAppBundlePath(),  // Adjusted path that includes the 'assets/' prefix
                 "runOverlay"  // Name of your Dart entry function
         );
 
