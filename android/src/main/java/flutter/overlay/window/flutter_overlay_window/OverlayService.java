@@ -310,47 +310,47 @@ public class OverlayService extends Service implements View.OnTouchListener {
     }
 
 
-    @Override
-    public void onCreate() {
-        createNotificationChannel();
+@Override
+public void onCreate() {
+    createNotificationChannel();
 
-        FlutterEngine flutterEngine = new FlutterEngine(this);
+    FlutterEngine flutterEngine = new FlutterEngine(this);
 
-        DartExecutor.DartEntrypoint entryPoint = new DartExecutor.DartEntrypoint(
-                FlutterMain.findAppBundlePath(),  // Adjusted path that includes the 'assets/' prefix
-                "runOverlay"  // Name of your Dart entry function
-        );
+    DartExecutor.DartEntrypoint entryPoint = new DartExecutor.DartEntrypoint(
+            FlutterMain.findAppBundlePath(),  // Adjusted path that includes the 'assets/' prefix
+            "runOverlay"  // Name of your Dart entry function
+    );
 
-        // Start executing Dart code to display the overlay
-        flutterEngine.getDartExecutor().executeDartEntrypoint(entryPoint);
+    // Start executing Dart code to display the overlay
+    flutterEngine.getDartExecutor().executeDartEntrypoint(entryPoint);
 
-        FlutterEngineCache.getInstance().put("overlay_engine", flutterEngine);
+    FlutterEngineCache.getInstance().put("overlay_engine", flutterEngine);
 
-        flutterChannel = new MethodChannel(FlutterEngineCache.getInstance().get("overlay_engine").getDartExecutor(), OverlayConstants.OVERLAY_TAG);
-        overlayMessageChannel = new BasicMessageChannel(FlutterEngineCache.getInstance().get("overlay_engine").getDartExecutor(), OverlayConstants.MESSENGER_TAG, JSONMessageCodec.INSTANCE);
+    flutterChannel = new MethodChannel(FlutterEngineCache.getInstance().get("overlay_engine").getDartExecutor(), OverlayConstants.OVERLAY_TAG);
+    overlayMessageChannel = new BasicMessageChannel(FlutterEngineCache.getInstance().get("overlay_engine").getDartExecutor(), OverlayConstants.MESSENGER_TAG, JSONMessageCodec.INSTANCE);
 
-
-
-        Intent notificationIntent = new Intent(this, FlutterOverlayWindowPlugin.class);
-        int pendingFlags;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
-            pendingFlags = PendingIntent.FLAG_IMMUTABLE;
-        } else {
-            pendingFlags = PendingIntent.FLAG_UPDATE_CURRENT;
-        }
-        PendingIntent pendingIntent = PendingIntent.getActivity(this,
-                0, notificationIntent, pendingFlags);
-        final int notifyIcon = getDrawableResourceId("mipmap", "launcher");
-        Notification notification = new NotificationCompat.Builder(this, OverlayConstants.CHANNEL_ID)
-                .setContentTitle(WindowSetup.overlayTitle)
-                .setContentText(WindowSetup.overlayContent)
-                .setSmallIcon(notifyIcon == 0 ? R.drawable.notification_icon : notifyIcon)
-                .setContentIntent(pendingIntent)
-                .setVisibility(WindowSetup.notificationVisibility)
-                .build();
-        startForeground(OverlayConstants.NOTIFICATION_ID, notification);
-        instance = this;
+    // Intent to close the overlay
+    Intent closeIntent = new Intent(this, OverlayService.class);
+    closeIntent.putExtra(INTENT_EXTRA_IS_CLOSE_WINDOW, true);
+    int pendingFlags;
+    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+        pendingFlags = PendingIntent.FLAG_IMMUTABLE;
+    } else {
+        pendingFlags = PendingIntent.FLAG_UPDATE_CURRENT;
     }
+    PendingIntent closePendingIntent = PendingIntent.getService(this, 0, closeIntent, pendingFlags);
+
+    final int notifyIcon = getDrawableResourceId("mipmap", "launcher");
+    Notification notification = new NotificationCompat.Builder(this, OverlayConstants.CHANNEL_ID)
+            .setContentTitle(WindowSetup.overlayTitle)
+            .setContentText(WindowSetup.overlayContent)
+            .setSmallIcon(notifyIcon == 0 ? R.drawable.notification_icon : notifyIcon)
+            .setContentIntent(closePendingIntent)
+            .setVisibility(WindowSetup.notificationVisibility)
+            .build();
+    startForeground(OverlayConstants.NOTIFICATION_ID, notification);
+    instance = this;
+}
 
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
